@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Manin Page</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+</head>
+<body class="bg-gray-50">
+    <img src="logo.png" alt="Logo" class="absolute top-0 left-0 m-4 w-24 h-auto">
+    <div class="flex items-center justify-center min-h-screen ">
+    <form action="/document" method="POST" enctype="multipart/form-data" class="space-y-4 bg-gray-200 py-5 px-5 rounded-md">
+        <table>
+            <tr>
+                <td>
+                     <div class="mt-2 flex items-center">
+                        <label for="logo" class="font-medium">Company Logo:</label>
+                        <input type="file" name="logo" accept="image/*">
+                    </div>
+                    <div class="mt-2 flex items-center">
+                        <label for="company-name" class="font-medium">Company Name:</label>
+                        <input type="text" name="company-name" class="w-55 h-6 border-gray-100 rounded-md shadow-md focus:ring-gray-200 focus:border-white">
+                    </div>
+                    <div class="mt-2 flex items-center">
+                        <label for="company-address" class="font-medium">Company Address:</label>
+                        <input type="text" name="company-address" class="w-55 h-6 border-gray-100 rounded-md shadow-md focus:ring-gray-200 focus:border-white">
+                    </div>
+                </td>
+                <td>
+                    <div class="mt-2 flex items-center">
+                        <label for="excel_file" class="font-medium">Add Data (Excel):</label>
+                        <input type="file" name="excel_file" accept=".xlsx, .xls">
+                    </div>
+                    <div class="mt-2 flex items-center">
+                        <label for="target-company-name" class="font-medium">Target Company Name:</label>
+                        <input type="text" name="target-company-name" class="w-55 h-6 border-gray-100 rounded-md shadow-md focus:ring-gray-200 focus:border-white">
+                    </div>
+                    <div class="mt-2 flex items-center">
+                        <label for="target-company-address" class="font-medium">Target Company Address:</label>
+                        <input type="text" name="target-company-address" class="w-55 h-6 border-gray-100 rounded-md shadow-md focus:ring-gray-200 focus:border-white">
+                    </div>
+                </td>
+            </tr>
+            <tr>
+                <td colspan="2"> 
+                    <div class="mt-4 flex items-center">
+                        <button type="submit" class="w-full h-6 bg-blue-500 text-white focus:ring-blue-600 rounded"> Get PDF </button>
+                    </div>
+                </td>
+            </tr>
+        </table>
+    </form>
+    </div>
+</body>
+</html>
