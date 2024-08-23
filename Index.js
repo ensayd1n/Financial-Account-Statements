@@ -39,8 +39,10 @@ const upload = multer({
     { name: 'excel_file', maxCount: 1 },
 ]);
 
+//excel dosyaları yolu tanımlama
 const excelDatasDir = path.join(__dirname, 'public', 'excel_datas');
 
+//son eklenen excel dosyasını tarih bilgilerine erişerek tanımlama
 const getLatestExcelFileSync = () => {
     const files = fs.readdirSync(excelDatasDir);
     let latestFile = null;
@@ -59,7 +61,9 @@ const getLatestExcelFileSync = () => {
     return latestFile ? path.join(excelDatasDir, latestFile) : null;
 };
 
+//image dosya yolunu tanımlama
 const imageDatasDir = path.join(__dirname, 'public', 'image_datas');
+//son eklenen image i tarih bilgisine erişerek tanımlama
 const getLatestImageFileSync = () => {
     const files = fs.readdirSync(imageDatasDir);
     let latestFile = null;
@@ -78,7 +82,6 @@ const getLatestImageFileSync = () => {
     return latestFile ? path.join(imageDatasDir, latestFile) : null;
 };
 
-const pdfOutputDir = path.join(__dirname, 'public', 'pdf_output');
 
 function getFormattedDate() {
     const today = new Date();
@@ -87,7 +90,9 @@ function getFormattedDate() {
     const year = today.getFullYear();
     return `${day}/${month}/${year}`;
 }
+//kullanıcıdan alınan text verilerini json olarak kaydedilmişti onların kayıtlı olduğu dosya yolunu tanımlama
 const inputDataDir=path.join(__dirname,'public','input_datas');
+//kayıt edilen son kullanıcı json verilerini tanımlama
 const getLatestInputFileSync = () => {
     const files = fs.readdirSync(inputDataDir);
     let latestFile = null;
@@ -105,15 +110,19 @@ const getLatestInputFileSync = () => {
 
     return latestFile ? path.join(inputDataDir, latestFile) : null;
 };
+//alınan json verilerini projede okunaklı hale getirme
 const readJsonFileSync = () => {
     try {
         const jsonData = fs.readFileSync(getLatestInputFileSync(), 'utf-8');
         return JSON.parse(jsonData);
     } catch (error) {
-        console.error('JSON dosyası okuma hatası:', error);
+        console.error('Error', error);
         return null;
     }
 };
+//pdf yolunu tanımlama
+const pdfOutputDir = path.join(__dirname, 'public', 'pdf_output');
+//excel dosyasını pdf e bir düzen ile çevirme
 async function convertExcelToPdf(filePath) {
     try {
 
@@ -191,17 +200,17 @@ async function convertExcelToPdf(filePath) {
         pdf.end();
        
     } catch (error) {
-        console.error('Hata oluştu:', error);
+        console.error('Error:', error);
     }
 }
-const pdfDataDir = path.join(__dirname,'public','pdf_output');
+// son eklenen pdf dosyasına tarih özelliğine erişerek bulup tanımlama
 const getLatestPdfFileSync = () => {
-    const files = fs.readdirSync(pdfDataDir);
+    const files = fs.readdirSync(pdfOutputDir);
     let latestFile = null;
     let latestMtime = 0;
 
     files.forEach(file => {
-        const filePath = path.join(pdfDataDir, file);
+        const filePath = path.join(pdfOutputDir, file);
         const stats = fs.statSync(filePath);
 
         if (stats.mtimeMs > latestMtime) {
@@ -210,15 +219,13 @@ const getLatestPdfFileSync = () => {
         }
     });
 
-    return latestFile ? path.join(pdfDataDir, latestFile) : null;
+    return latestFile ? path.join(pdfOutputDir, latestFile) : null;
 };
 
-
+//document sayfası
 app.post('/document', upload, async (req, res) => {
     const latestFile = getLatestExcelFileSync();
     if (latestFile) {
-        console.log('Son eklenen dosya:', latestFile);
-
         const {'company-name':companyName,'company-address': companyAddress, 'target-company-name': targetCompanyName, 'target-company-address': targetCompanyAddress } = req.body;
         const jsonData = {
             companyName,
@@ -234,17 +241,15 @@ app.post('/document', upload, async (req, res) => {
         await convertExcelToPdf(latestFile);
 
         res.render('document');
-    } else {
-        console.log('Klasörde dosya bulunamadı.');
-        res.status(404).send('Dosya bulunamadı.');
     }
 });
 
+//pdf dosyasını indirme aksiyonu
 app.get('/download-pdf', (req, res) => {
     const latestPdf = getLatestPdfFileSync();
     res.download(latestPdf, path.basename(latestPdf));
 });
-
+//anasayfa
 app.get('/', (req, res) => {
     res.render('home');
 });
