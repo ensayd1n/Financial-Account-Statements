@@ -5,6 +5,7 @@ const multer = require('multer');
 const ExcelJS = require('exceljs');
 const PDFDocument = require('pdfkit');
 const fs = require('fs');
+const { error } = require('console');
 
 const app = express();
 const port = 3000;
@@ -137,7 +138,7 @@ async function convertExcelToPdf(filePath) {
         
         
         pdf.moveDown(3)
-            .fontSize(12).text('Sayın', { align: 'left' })
+            .fontSize(12).text('Sayin', { align: 'left' })
             .fontSize(14).font('Helvetica-Bold').text(jsonData.targetCompanyName)
             .fontSize(10).font('Helvetica').text(jsonData.targetCompanyAddress);
 
@@ -193,6 +194,24 @@ async function convertExcelToPdf(filePath) {
         console.error('Hata oluştu:', error);
     }
 }
+const pdfDataDir = path.join(__dirname,'public','pdf_output');
+const getLatestPdfFileSync = () => {
+    const files = fs.readdirSync(pdfDataDir);
+    let latestFile = null;
+    let latestMtime = 0;
+
+    files.forEach(file => {
+        const filePath = path.join(pdfDataDir, file);
+        const stats = fs.statSync(filePath);
+
+        if (stats.mtimeMs > latestMtime) {
+            latestMtime = stats.mtimeMs;
+            latestFile = file;
+        }
+    });
+
+    return latestFile ? path.join(pdfDataDir, latestFile) : null;
+};
 
 
 app.post('/document', upload, async (req, res) => {
@@ -219,6 +238,11 @@ app.post('/document', upload, async (req, res) => {
         console.log('Klasörde dosya bulunamadı.');
         res.status(404).send('Dosya bulunamadı.');
     }
+});
+
+app.get('/download-pdf', (req, res) => {
+    const latestPdf = getLatestPdfFileSync();
+    res.download(latestPdf, path.basename(latestPdf));
 });
 
 app.get('/', (req, res) => {
